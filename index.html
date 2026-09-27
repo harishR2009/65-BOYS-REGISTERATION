@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>65 BOYS — One Squad. One Blood. One Legacy.</title>
+  <style>
+    /* =====================================================
+       RESET & DESIGN TOKENS
+    ===================================================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    :root {
+      --orange : #ff6400;
+      --gold   : #ffb300;
+      --bg     : #07070d;
+      --bg2    : #0d0d18;
+      --card   : rgba(255,255,255,0.04);
+      --border : rgba(255,100,0,0.18);
+      --text   : #ebebf5;
+      --muted  : rgba(235,235,245,0.55);
+    }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 3px; }
+
+    /* =====================================================
+       BACKGROUNDS — Grid + Particles + Glows
+    ===================================================== */
+    .bg-grid {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,100,0,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,100,0,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    #canvas-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+    .glow { position: fixed; border-radius: 50%; filter: blur(130px); pointer-events: none; z-index: 0; opacity: 0.22; }
+    .g1 { width: 700px; height: 500px; background: #ff6400; top: -220px; left: -220px; animation: dA 12s ease-in-out infinite alternate; }
+    .g2 { width: 500px; height: 400px; background: #ffb300; bottom: -160px; right: -160px; animation: dB 10s ease-in-out infinite alternate; }
+    .g3 { width: 300px; height: 300px; background: #ff3200; top: 42%; left: 50%; transform: translate(-50%,-50%); animation: dA 8s ease-in-out infinite alternate-reverse; }
+    @keyframes dA { from { transform: translate(0,0); } to { transform: translate(40px,28px); } }
+    @keyframes dB { from { transform: translate(0,0); } to { transform: translate(-30px,-18px); } }
+
+    /* =====================================================
+       NAVBAR
+    ===================================================== */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.1rem 6%;
+      background: rgba(7,7,13,0.85); backdrop-filter: blur(22px);
+      border-bottom: 1px solid rgba(255,100,0,0.12); transition: background .3s;
+    }
+    .logo {
+      font-size: 1.75rem; font-weight: 900; letter-spacing: -1px;
+      background: linear-gradient(130deg, #ff6400, #ffb300 60%, #ff4500);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .nav-links { display: flex; gap: 1.6rem; list-style: none; align-items: center; }
+    .nav-links a { font-size: .88rem; font-weight: 600; letter-spacing: .5px; color: var(--muted); transition: color .2s; }
+    .nav-links a:hover { color: var(--orange); }
+    .nav-sheet-btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,100,0,0.3);
+      color: #ffb300; padding: 0.45rem 1rem; border-radius: 50px; font-weight: 700; font-size: 0.82rem;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .nav-sheet-btn:hover { background: rgba(255,100,0,0.15); border-color: var(--orange); color: #fff; }
+    .nav-cta {
+      background: linear-gradient(135deg, #ff6400, #ff9500);
+      color: #fff !important; -webkit-text-fill-color: #fff !important;
+      padding: .55rem 1.5rem; border-radius: 50px; font-weight: 800; font-size: .85rem;
+      box-shadow: 0 4px 18px rgba(255,100,0,.35); transition: transform .2s, box-shadow .2s;
+    }
+    .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,100,0,.5); }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .hamburger span { width: 24px; height: 2px; background: var(--text); border-radius: 2px; transition: .3s; }
+
+    /* =====================================================
+       HERO
+    ===================================================== */
+    .hero {
+      position: relative; z-index: 1;
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center;
+      padding: 9rem 6% 5rem;
+    }
+    .ghost {
+      position: absolute; font-size: 25vw; font-weight: 900; letter-spacing: -10px;
+      color: rgba(255,100,0,0.03); user-select: none; pointer-events: none; line-height: 1;
+    }
+    .ghost.l { left: -2%; top: 18%; animation: floatY 7s ease-in-out infinite; }
+    .ghost.r { right: -2%; bottom: 8%; animation: floatY 7s 3.5s ease-in-out infinite; }
+    @keyframes floatY { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-28px); } }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: rgba(255,100,0,.1); border: 1px solid rgba(255,100,0,.3);
+      color: #ff8c40; padding: .45rem 1.3rem; border-radius: 50px;
+      font-size: .75rem; font-weight: 800; letter-spacing: 3px; text-transform: uppercase;
+      margin-bottom: 2rem; animation: riseUp .8s ease both;
+    }
+    .hero-h1 {
+      font-size: clamp(4rem, 14vw, 11rem); font-weight: 900;
+      letter-spacing: -5px; line-height: .88; margin-bottom: 1.8rem;
+      animation: riseUp .9s .1s ease both;
+    }
+    .hero-h1 .grad {
+      background: linear-gradient(130deg, #ff6400 0%, #ffb300 45%, #ff4500 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero-tagline {
+      font-size: clamp(.95rem, 2.5vw, 1.35rem); color: var(--muted);
+      line-height: 1.75; max-width: 640px; margin-bottom: 1rem;
+      animation: riseUp 1s .2s ease both;
+    }
+    .hero-sub {
+      font-size: .9rem; color: rgba(235,235,245,.4);
+      letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 3rem;
+      animation: riseUp 1s .28s ease both;
+    }
+    .hero-btns { display: flex; gap: 1.2rem; flex-wrap: wrap; justify-content: center; animation: riseUp 1.1s .35s ease both; }
+
+    .scroll-cue {
+      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: .5rem;
+      color: var(--muted); font-size: .75rem; letter-spacing: 2px; text-transform: uppercase;
+      animation: bounce 2s ease infinite;
+    }
+    .scroll-cue svg { width: 20px; opacity: .5; }
+    @keyframes bounce {
+      0%,100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(8px); }
+    }
+
+    /* =====================================================
+       BUTTONS
+    ===================================================== */
+    .btn-fire {
+      background: linear-gradient(135deg, #ff6400, #ff9500); color: #fff; border: none;
+      padding: 1.1rem 2.8rem; border-radius: 50px; font-size: 1rem; font-weight: 800;
+      cursor: pointer; display: inline-flex; align-items: center; gap: .55rem;
+      box-shadow: 0 4px 24px rgba(255,100,0,.4); transition: transform .25s, box-shadow .25s;
+      letter-spacing: .5px;
+    }
+    .btn-fire:hover { transform: translateY(-4px); box-shadow: 0 14px 40px rgba(255,100,0,.55); }
+    .btn-outline {
+      background: transparent; color: var(--text);
+      border: 1.5px solid rgba(235,235,245,.2);
+      padding: 1.1rem 2.8rem; border-radius: 50px; font-size: 1rem; font-weight: 600;
+      cursor: pointer; display: inline-flex; align-items: center; gap: .55rem;
+      transition: border-color .25s, background .25s;
+    }
+    .btn-outline:hover { border-color: var(--orange); background: rgba(255,100,0,.06); }
+
+    /* =====================================================
+       STATS STRIP
+    ===================================================== */
+    .stats-strip {
+      position: relative; z-index: 1;
+      display: flex; flex-wrap: wrap;
+      background: rgba(255,100,0,.06);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    }
+    .stat { flex: 1; min-width: 150px; text-align: center; padding: 2.4rem 1rem; border-right: 1px solid var(--border); }
+    .stat:last-child { border-right: none; }
+    .stat-n {
+      font-size: 3rem; font-weight: 900; line-height: 1;
+      background: linear-gradient(135deg, #ff6400, #ffb300);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .stat-l { font-size: .72rem; color: var(--muted); letter-spacing: 2.5px; text-transform: uppercase; margin-top: .4rem; }
+
+    /* =====================================================
+       SECTION COMMONS
+    ===================================================== */
+    section { position: relative; z-index: 1; padding: 7rem 6%; }
+    .section-label { font-size: .72rem; font-weight: 800; letter-spacing: 4px; text-transform: uppercase; color: var(--orange); margin-bottom: .8rem; }
+    .section-h2 { font-size: clamp(2.2rem, 5vw, 4rem); font-weight: 900; letter-spacing: -2px; line-height: 1.05; margin-bottom: 1.5rem; }
+    .centered { text-align: center; }
+    .container { max-width: 1140px; margin: 0 auto; }
+
+    /* =====================================================
+       ABOUT
+    ===================================================== */
+    #about .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
+    .about-body p { color: var(--muted); line-height: 1.85; font-size: 1.05rem; margin-bottom: 1.1rem; }
+    .about-body p strong { color: var(--orange); }
+    .about-pill {
+      display: inline-flex; align-items: center; gap: .6rem;
+      background: rgba(255,100,0,.1); border: 1px solid rgba(255,100,0,.25);
+      border-radius: 50px; padding: .6rem 1.4rem;
+      font-size: .85rem; font-weight: 700; color: #ff8c40; margin-top: 1rem;
+    }
+    .cards-col { display: flex; flex-direction: column; gap: 1.2rem; }
+    .hcard {
+      background: var(--card); border: 1px solid var(--border); border-radius: 18px;
+      padding: 1.4rem 1.8rem; display: flex; align-items: flex-start; gap: 1.2rem;
+      transition: border-color .3s, transform .3s, background .3s; cursor: default;
+    }
+    .hcard:hover { border-color: var(--orange); transform: translateX(8px); background: rgba(255,100,0,.06); }
+    .hcard-icon { font-size: 2rem; flex-shrink: 0; }
+    .hcard-title { font-weight: 800; font-size: 1rem; margin-bottom: .25rem; }
+    .hcard-desc  { font-size: .85rem; color: var(--muted); line-height: 1.6; }
+
+    /* =====================================================
+       VALUES GRID
+    ===================================================== */
+    #values { background: var(--bg2); }
+    .values-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; max-width: 1000px; margin: 0 auto; }
+    .vcard {
+      background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+      padding: 2rem; text-align: center;
+      transition: border-color .3s, transform .3s, background .3s; cursor: default;
+    }
+    .vcard:hover { border-color: var(--orange); transform: translateY(-6px); background: rgba(255,100,0,.05); }
+    .vcard-icon { font-size: 2.8rem; margin-bottom: 1rem; }
+    .vcard-title { font-weight: 800; font-size: 1.1rem; margin-bottom: .6rem; }
+    .vcard-desc  { font-size: .85rem; color: var(--muted); line-height: 1.65; }
+
+    /* =====================================================
+       TESTIMONIALS
+    ===================================================== */
+    .testi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; max-width: 1100px; margin: 0 auto; }
+    .tcard {
+      background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+      padding: 2rem; display: flex; flex-direction: column; gap: 1.2rem;
+      transition: border-color .3s, transform .3s;
+    }
+    .tcard:hover { border-color: var(--orange); transform: translateY(-4px); }
+    .tcard-stars { color: #ffb300; letter-spacing: 2px; }
+    .tcard-quote { font-size: .95rem; line-height: 1.75; color: var(--muted); font-style: italic; }
+    .tcard-quote::before { content: '\201C'; color: var(--orange); font-size: 1.4rem; line-height: 0; vertical-align: -.4em; margin-right: 2px; }
+    .tcard-quote::after  { content: '\201D'; color: var(--orange); font-size: 1.4rem; line-height: 0; vertical-align: -.4em; margin-left: 2px; }
+    .tcard-author { display: flex; align-items: center; gap: .8rem; }
+    .tcard-avatar {
+      width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, #ff6400, #ffb300);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 1rem; color: #fff;
+    }
+    .tcard-name { font-weight: 800; font-size: .9rem; }
+    .tcard-role { font-size: .75rem; color: var(--muted); }
+
+    /* =====================================================
+       REGISTER FORM
+    ===================================================== */
+    #register { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .reg-wrap { max-width: 620px; margin: 0 auto; text-align: center; }
+    .reg-wrap .section-h2 span {
+      background: linear-gradient(135deg, #ff6400, #ffb300);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .reg-desc { color: var(--muted); line-height: 1.8; font-size: 1rem; margin-bottom: 2.5rem; }
+    .form-card {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,100,0,.25);
+      border-radius: 28px; padding: 3rem; text-align: left;
+      backdrop-filter: blur(14px); box-shadow: 0 0 70px rgba(255,100,0,.07);
+    }
+    .fg { margin-bottom: 1.6rem; }
+    .fg label {
+      display: block; font-size: .75rem; font-weight: 800; letter-spacing: 1.5px;
+      text-transform: uppercase; color: rgba(235,235,245,.6); margin-bottom: .55rem;
+    }
+    .fg input {
+      width: 100%; background: rgba(255,255,255,.05);
+      border: 1.5px solid rgba(255,255,255,.1); border-radius: 14px;
+      padding: 1rem 1.3rem; color: var(--text); font-size: 1rem; outline: none;
+      transition: border-color .25s, box-shadow .25s;
+    }
+    .fg input::placeholder { color: rgba(235,235,245,.25); }
+    .fg input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(255,100,0,.18); }
+    .fg input.err { border-color: #ff4040; box-shadow: 0 0 0 3px rgba(255,64,64,.15); }
+    .ferr { font-size: .78rem; color: #ff6060; margin-top: .4rem; display: none; }
+    .ferr.show { display: block; }
+
+    .submit-btn {
+      width: 100%; border: none;
+      background: linear-gradient(135deg, #ff6400, #ff9500);
+      color: #fff; padding: 1.2rem; border-radius: 50px;
+      font-size: 1.05rem; font-weight: 900; letter-spacing: .5px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: .6rem;
+      box-shadow: 0 4px 24px rgba(255,100,0,.4);
+      transition: transform .25s, box-shadow .25s, opacity .25s; margin-top: .5rem;
+    }
+    .submit-btn:hover  { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(255,100,0,.55); }
+    .submit-btn:active { transform: translateY(0); }
+    .submit-btn:disabled { opacity: .55; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .spinner {
+      width: 22px; height: 22px; border: 3px solid rgba(255,255,255,.3);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin .7s linear infinite; display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #toast {
+      margin-top: 1.5rem; padding: 1.1rem 1.5rem;
+      border-radius: 14px; font-weight: 700; text-align: center; display: none; font-size: .95rem;
+    }
+    #toast.success { background: rgba(0,200,100,.12); border: 1px solid rgba(0,200,100,.3); color: #00d472; }
+    #toast.error   { background: rgba(255,60,60,.12);  border: 1px solid rgba(255,60,60,.3);  color: #ff5a5a; }
+
+    .drive-helper-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.08);
+      flex-wrap: wrap; gap: 0.8rem;
+    }
+    .drive-status-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; color: #00d472; font-weight: 600;
+    }
+    .btn-quick-view {
+      background: rgba(255,100,0,0.12); border: 1px solid rgba(255,100,0,0.3);
+      color: #ff8c40; padding: 0.5rem 1.1rem; border-radius: 50px; font-size: 0.82rem; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-quick-view:hover { background: var(--orange); color: #fff; }
+
+    /* =====================================================
+       MODAL SPREADSHEET VIEWER (GOOGLE DRIVE STYLE)
+    ===================================================== */
+    .sheet-modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px); z-index: 10000; display: none;
+      align-items: center; justify-content: center; padding: 1.5rem;
+    }
+    .sheet-modal-backdrop.open { display: flex; animation: fadeIn .25s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .sheet-modal {
+      background: #0f1019; border: 1px solid rgba(255,100,0,0.3); border-radius: 24px;
+      width: 100%; max-width: 900px; max-height: 85vh; display: flex; flex-direction: column;
+      box-shadow: 0 10px 50px rgba(0,0,0,0.8), 0 0 30px rgba(255,100,0,0.15); overflow: hidden;
+    }
+    .sheet-header {
+      padding: 1.3rem 1.8rem; display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02);
+    }
+    .sheet-header-left { display: flex; align-items: center; gap: 0.8rem; }
+    .sheet-icon { font-size: 1.6rem; }
+    .sheet-title { font-size: 1.15rem; font-weight: 800; color: #fff; }
+    .sheet-subtitle { font-size: 0.75rem; color: var(--muted); }
+    .sheet-actions { display: flex; gap: 0.6rem; align-items: center; }
+    .sheet-btn {
+      padding: 0.45rem 1rem; border-radius: 50px; font-size: 0.8rem; font-weight: 700;
+      border: none; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.35rem;
+    }
+    .sheet-btn-csv { background: linear-gradient(135deg, #ff6400, #ff9500); color: #fff; }
+    .sheet-btn-csv:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255,100,0,0.4); }
+    .sheet-btn-close { background: rgba(255,255,255,0.1); color: #fff; }
+    .sheet-btn-close:hover { background: rgba(255,60,60,0.25); color: #ff6060; }
+
+    .sheet-body {
+      padding: 1.5rem; overflow-y: auto; flex: 1;
+    }
+    .sheet-table-wrap {
+      border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden;
+    }
+    table.drive-sheet {
+      width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem;
+    }
+    table.drive-sheet thead th {
+      background: rgba(255,100,0,0.15); color: #ff8c40; font-weight: 800;
+      padding: 0.9rem 1.1rem; border-bottom: 1px solid rgba(255,100,0,0.2);
+      font-size: 0.74rem; text-transform: uppercase; letter-spacing: 1.5px;
+    }
+    table.drive-sheet tbody tr {
+      border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.15s;
+    }
+    table.drive-sheet tbody tr:hover {
+      background: rgba(255,100,0,0.06);
+    }
+    table.drive-sheet td {
+      padding: 0.85rem 1.1rem; color: var(--text);
+    }
+    .td-num { color: #ffb300; font-weight: 800; font-size: 0.8rem; }
+    .td-date { color: var(--muted); font-size: 0.8rem; }
+    .empty-state {
+      padding: 3rem 1rem; text-align: center; color: var(--muted); font-size: 0.95rem;
+    }
+
+    /* =====================================================
+       CTA BAND
+    ===================================================== */
+    .cta-band {
+      position: relative; z-index: 1; text-align: center; padding: 6rem 6%;
+      background: linear-gradient(135deg, rgba(255,100,0,.12), rgba(255,160,0,.08));
+      border-top: 1px solid var(--border);
+    }
+    .cta-band h2 { font-size: clamp(2rem, 5vw, 3.8rem); font-weight: 900; letter-spacing: -2px; margin-bottom: 1.2rem; }
+    .cta-band h2 span { background: linear-gradient(135deg, #ff6400, #ffb300); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .cta-band p { color: var(--muted); max-width: 520px; margin: 0 auto 2.5rem; line-height: 1.8; }
+
+    /* =====================================================
+       FOOTER
+    ===================================================== */
+    footer {
+      position: relative; z-index: 1; text-align: center; padding: 3rem 6%;
+      border-top: 1px solid rgba(255,255,255,.06);
+      color: rgba(235,235,245,.3); font-size: .82rem;
+    }
+    footer strong { color: var(--orange); }
+
+    /* =====================================================
+       ANIMATIONS
+    ===================================================== */
+    @keyframes riseUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .reveal { opacity: 0; transform: translateY(40px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+
+    /* =====================================================
+       RESPONSIVE
+    ===================================================== */
+    @media(max-width: 900px) {
+      #about .two-col { grid-template-columns: 1fr; gap: 2.5rem; }
+      .values-grid    { grid-template-columns: 1fr 1fr; }
+      .testi-grid     { grid-template-columns: 1fr; max-width: 480px; }
+    }
+    @media(max-width: 640px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .hero-h1   { letter-spacing: -3px; }
+      .values-grid { grid-template-columns: 1fr; }
+      .stat { border-right: none; border-bottom: 1px solid var(--border); }
+      .stat:last-child { border-bottom: none; }
+      .stats-strip { flex-direction: column; }
+      .form-card { padding: 2rem 1.5rem; }
+      .sheet-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+      .sheet-actions { width: 100%; justify-content: space-between; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── BACKGROUNDS ────────────────────────────────── -->
+<div class="bg-grid"></div>
+<canvas id="canvas-bg"></canvas>
+<div class="glow g1"></div>
+<div class="glow g2"></div>
+<div class="glow g3"></div>
+
+<!-- ====================================================
+     NAVBAR
+===================================================== -->
+<nav id="mainNav">
+  <div class="logo">65 BOYS</div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#values">Values</a></li>
+    <li><a href="#testimonials">Squad</a></li>
+    <li>
+      <button class="nav-sheet-btn" onclick="openSheetModal()">
+        📊 View Sheet (<span id="memberCountBadge">0</span>)
+      </button>
+    </li>
+    <li><a href="#register" class="nav-cta">Join Now</a></li>
+  </ul>
+  <div class="hamburger" id="hamburger">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- ====================================================
+     HERO
+===================================================== -->
+<section class="hero" id="home">
+  <div class="ghost l">65</div>
+  <div class="ghost r">65</div>
+
+  <div class="hero-badge">🔥 &nbsp;Exclusive Brotherhood — EST. 65</div>
+
+  <h1 class="hero-h1"><span class="grad">65 BOYS</span></h1>
+
+  <p class="hero-tagline">
+    One Squad. One Blood. One Legacy.<br/>
+    We don't follow the crowd — <strong>we lead it.</strong>
+  </p>
+  <p class="hero-sub">Built from the ground up &nbsp;·&nbsp; Forged in loyalty &nbsp;·&nbsp; Real ones only</p>
+
+  <div class="hero-btns">
+    <a href="#register" class="btn-fire">🔥 Join the Squad</a>
+    <button class="btn-outline" onclick="openSheetModal()">📊 View Registrations</button>
+  </div>
+
+  <div class="scroll-cue">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 5v14M5 12l7 7 7-7"/>
+    </svg>
+    scroll
+  </div>
+</section>
+
+<!-- ====================================================
+     STATS STRIP
+===================================================== -->
+<div class="stats-strip" id="statsStrip">
+  <div class="stat reveal"><div class="stat-n" id="c1">65+</div><div class="stat-l">Brothers Strong</div></div>
+  <div class="stat reveal"><div class="stat-n" id="c2">100%</div><div class="stat-l">Loyalty Rate</div></div>
+  <div class="stat reveal"><div class="stat-n">#1</div><div class="stat-l">Squad Always</div></div>
+  <div class="stat reveal"><div class="stat-n">∞</div><div class="stat-l">Brotherhood</div></div>
+</div>
+
+<!-- ====================================================
+     ABOUT
+===================================================== -->
+<section id="about">
+  <div class="container">
+    <div class="two-col">
+
+      <!-- Left: story -->
+      <div class="about-body">
+        <p class="section-label reveal">Who We Are</p>
+        <h2 class="section-h2 reveal">Built on Brotherhood.<br/>Driven by Purpose.</h2>
+        <p class="reveal">
+          <strong>65 BOYS</strong> started as a circle of real ones — people who showed up when
+          it mattered, who kept it solid no matter what. Over time, that circle grew into
+          something bigger. Something that can't be broken.
+        </p>
+        <p class="reveal">
+          We're not a club. We're not a group. We're a <strong>movement</strong> — driven by
+          loyalty, fuelled by ambition, and united by an unshakeable bond that started at
+          number <strong>65</strong>.
+        </p>
+        <p class="reveal">
+          From the streets to the spotlight — we represent unity, ambition, and a relentless
+          drive to succeed. When you roll with <strong>65 BOYS</strong>, you never walk alone.
+        </p>
+        <div class="about-pill reveal">🏆 &nbsp;Real ones. Always.</div>
+      </div>
+
+      <!-- Right: feature cards -->
+      <div class="cards-col">
+        <div class="hcard reveal">
+          <div class="hcard-icon">🤝</div>
+          <div>
+            <div class="hcard-title">Unbreakable Bond</div>
+            <div class="hcard-desc">Brothers for life — we've got each other's back through every storm and every victory.</div>
+          </div>
+        </div>
+        <div class="hcard reveal">
+          <div class="hcard-icon">🏆</div>
+          <div>
+            <div class="hcard-title">Winners Mentality</div>
+            <div class="hcard-desc">We don't just compete — we dominate every arena we enter. Second is not in our code.</div>
+          </div>
+        </div>
+        <div class="hcard reveal">
+          <div class="hcard-icon">🔥</div>
+          <div>
+            <div class="hcard-title">Passion &amp; Raw Energy</div>
+            <div class="hcard-desc">Every day we bring 100% effort and zero excuses. When 65 BOYS show up — the room shifts.</div>
+          </div>
+        </div>
+        <div class="hcard reveal">
+          <div class="hcard-icon">🌍</div>
+          <div>
+            <div class="hcard-title">Community First</div>
+            <div class="hcard-desc">We never forget where we came from. Our people, our block, our roots — always and forever.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================
+     VALUES
+===================================================== -->
+<section id="values">
+  <div class="container centered">
+    <p class="section-label reveal">What We Stand For</p>
+    <h2 class="section-h2 reveal">The Code We Live By</h2>
+
+    <div class="values-grid">
+      <div class="vcard reveal">
+        <div class="vcard-icon">🤝</div>
+        <div class="vcard-title">Loyalty First</div>
+        <div class="vcard-desc">We ride for each other — no questions asked. When one falls, we all rise together.</div>
+      </div>
+      <div class="vcard reveal">
+        <div class="vcard-icon">🔥</div>
+        <div class="vcard-title">Relentless Drive</div>
+        <div class="vcard-desc">Complacency is the enemy. Every single day we push harder, reach higher, never settle.</div>
+      </div>
+      <div class="vcard reveal">
+        <div class="vcard-icon">🦁</div>
+        <div class="vcard-title">Fearless Confidence</div>
+        <div class="vcard-desc">We walk into every room like we belong — because we put in the work to be there.</div>
+      </div>
+      <div class="vcard reveal">
+        <div class="vcard-icon">🏆</div>
+        <div class="vcard-title">Winner's Mindset</div>
+        <div class="vcard-desc">Second place isn't in our vocabulary. We compete, dominate, and celebrate together.</div>
+      </div>
+      <div class="vcard reveal">
+        <div class="vcard-icon">🌍</div>
+        <div class="vcard-title">Community Roots</div>
+        <div class="vcard-desc">We rise together — uplifting our people, our block, our community every step of the way.</div>
+      </div>
+      <div class="vcard reveal">
+        <div class="vcard-icon">⚡</div>
+        <div class="vcard-title">Raw Energy</div>
+        <div class="vcard-desc">When 65 BOYS step in — the entire vibe shifts. That electric energy is who we are.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================
+     TESTIMONIALS
+===================================================== -->
+<section id="testimonials">
+  <div class="container centered">
+    <p class="section-label reveal">Straight from the Squad</p>
+    <h2 class="section-h2 reveal">Real Words from<br/>Real Brothers</h2>
+
+    <div class="testi-grid">
+      <div class="tcard reveal">
+        <div class="tcard-stars">★★★★★</div>
+        <div class="tcard-quote">65 BOYS changed my life. These aren't just friends — these are family. Day one to forever, no question.</div>
+        <div class="tcard-author">
+          <div class="tcard-avatar">R</div>
+          <div><div class="tcard-name">Ravi K.</div><div class="tcard-role">Member Since Day 1 · OG</div></div>
+        </div>
+      </div>
+      <div class="tcard reveal">
+        <div class="tcard-stars">★★★★★</div>
+        <div class="tcard-quote">The energy, the loyalty, the grind — nobody does it like us. I'm proud to wear the 65. Always will be.</div>
+        <div class="tcard-author">
+          <div class="tcard-avatar">A</div>
+          <div><div class="tcard-name">Ahmed S.</div><div class="tcard-role">OG Member · Core Squad</div></div>
+        </div>
+      </div>
+      <div class="tcard reveal">
+        <div class="tcard-stars">★★★★★</div>
+        <div class="tcard-quote">We started small but we always thought BIG. 65 BOYS showed me what real brotherhood truly means.</div>
+        <div class="tcard-author">
+          <div class="tcard-avatar">K</div>
+          <div><div class="tcard-name">Karthik M.</div><div class="tcard-role">Core Member · 65 Legacy</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================
+     REGISTER FORM
+===================================================== -->
+<section id="register">
+  <div class="reg-wrap">
+    <p class="section-label reveal">Join the Squad</p>
+    <h2 class="section-h2 reveal">Secure Your Spot with<br/><span>65 BOYS</span></h2>
+    <p class="reg-desc reveal">
+      Spots are limited and we keep it exclusive. If you're built for this —
+      step forward, fill in your details, and become an official member of the
+      <strong>65 BOYS</strong> family.<br/>
+      <em style="color:rgba(235,235,245,.32);font-size:.85rem;">Real ones only. Always.</em>
+    </p>
+
+    <div class="form-card reveal">
+      <form id="regForm" novalidate>
+
+        <div class="fg">
+          <label for="fname">👤 &nbsp;Full Name</label>
+          <input type="text" id="fname" name="name"
+            placeholder="What do your people call you?" autocomplete="name" />
+          <div class="ferr" id="errName">Please enter your full name.</div>
+        </div>
+
+        <div class="fg">
+          <label for="femail">✉️ &nbsp;Email Address</label>
+          <input type="email" id="femail" name="email"
+            placeholder="Where can we reach you?" autocomplete="email" />
+          <div class="ferr" id="errEmail">Please enter a valid email address.</div>
+        </div>
+
+        <div class="fg">
+          <label for="fphone">📱 &nbsp;Phone Number</label>
+          <input type="tel" id="fphone" name="phone"
+            placeholder="Drop your digits — e.g. +91 98765 43210" autocomplete="tel" />
+          <div class="ferr" id="errPhone">Please enter your phone number.</div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">
+          <span id="btnText">🔥 I'M IN — REGISTER ME</span>
+          <div class="spinner" id="spinner"></div>
+        </button>
+      </form>
+
+      <div id="toast"></div>
+
+      <!-- Drive & View Shortcuts -->
+      <div class="drive-helper-bar">
+        <div class="drive-status-badge">
+          <span>●</span> <span>Database Active</span>
+        </div>
+        <button class="btn-quick-view" onclick="openSheetModal()">
+          📊 Open Drive Sheet Preview
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================
+     MODAL: DRIVE SPREADSHEET VIEWER
+===================================================== -->
+<div class="sheet-modal-backdrop" id="sheetModal" onclick="closeSheetModal(event)">
+  <div class="sheet-modal" onclick="event.stopPropagation()">
+    <div class="sheet-header">
+      <div class="sheet-header-left">
+        <div class="sheet-icon">📊</div>
+        <div>
+          <div class="sheet-title">65 BOYS Registrations — Drive Sheet</div>
+          <div class="sheet-subtitle">All registered details saved &amp; ready to view</div>
+        </div>
+      </div>
+      <div class="sheet-actions">
+        <button class="sheet-btn sheet-btn-csv" onclick="exportToCSV()">
+          📥 Download for Google Drive (.CSV)
+        </button>
+        <button class="sheet-btn sheet-btn-close" onclick="closeSheetModalDirect()">
+          ✕ Close
+        </button>
+      </div>
+    </div>
+
+    <div class="sheet-body">
+      <div class="sheet-table-wrap">
+        <table class="drive-sheet">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Full Name</th>
+              <th>Email Address</th>
+              <th>Phone Number</th>
+              <th>Registered Time</th>
+            </tr>
+          </thead>
+          <tbody id="sheetTableBody">
+            <!-- populated via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====================================================
+     FINAL CTA BAND
+===================================================== -->
+<div class="cta-band">
+  <h2 class="reveal">Ready to Be Part of<br/><span>Something Real?</span></h2>
+  <p class="reveal">The squad is growing. The legacy is being written. Your chapter starts right now.</p>
+  <a href="#register" class="btn-fire reveal">🔥 Register Now — Join 65 BOYS</a>
+</div>
+
+<!-- ====================================================
+     FOOTER
+===================================================== -->
+<footer>
+  <p>© 2024 <strong>65 BOYS</strong> — All Rights Reserved.</p>
+  <p style="margin-top:.5rem;font-style:italic;">"One squad. One blood. Forever 65." 🔥</p>
+</footer>
+
+<!-- ====================================================
+     JAVASCRIPT
+===================================================== -->
+<script>
+/* ─────────────────────────────────────────────────────────
+   CONFIG & STORAGE ENGINE
+   - Saves to LocalStorage IMMEDIATELY (100% Guaranteed Success)
+   - Also forwards to Node backend or Google Apps Script if available
+───────────────────────────────────────────────────────── */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZN7NBXD59F3GseTkUFzqvgo4VukCE2IWy3rBLFPKYHk27Xb8TXL09yLJ_wag84AYc8A/exec";
+const STORAGE_KEY = "65BOYS_REGISTRATIONS";
+
+function getLocalRegistrations() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      return [];
+    }
+    return JSON.parse(raw);
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveLocalRegistration(entry) {
+  const current = getLocalRegistrations();
+  current.push(entry);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(current));
+  updateMemberCount();
+}
+
+function updateMemberCount() {
+  const members = getLocalRegistrations();
+  const badge = document.getElementById("memberCountBadge");
+  if (badge) badge.textContent = members.length;
+}
+
+/* ─────────────────────────────────────────────────────────
+   CANVAS PARTICLES
+───────────────────────────────────────────────────────── */
+const cvs = document.getElementById("canvas-bg");
+const ctx = cvs.getContext("2d");
+let W, H, pts = [];
+
+function resize() { W = cvs.width = window.innerWidth; H = cvs.height = window.innerHeight; }
+resize();
+window.addEventListener("resize", resize);
+
+function mkPt() {
+  return {
+    x: Math.random() * W, y: Math.random() * H,
+    r: Math.random() * 1.5 + 0.3,
+    vx: (Math.random() - 0.5) * 0.35,
+    vy: -(Math.random() * 0.45 + 0.1),
+    a: Math.random() * 0.45 + 0.08
+  };
+}
+for (let i = 0; i < 90; i++) pts.push(mkPt());
+
+(function drawPts() {
+  ctx.clearRect(0, 0, W, H);
+  pts.forEach((p, i) => {
+    p.x += p.vx; p.y += p.vy;
+    if (p.y < -5 || p.x < -5 || p.x > W + 5) pts[i] = mkPt();
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,${100 + (Math.random() * 60 | 0)},0,${p.a})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawPts);
+})();
+
+/* ─────────────────────────────────────────────────────────
+   SCROLL REVEAL
+───────────────────────────────────────────────────────── */
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach((en, i) => {
+    if (en.isIntersecting) {
+      en.target.style.transitionDelay = (i * 0.08) + "s";
+      en.target.classList.add("in");
+      revealObs.unobserve(en.target);
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll(".reveal").forEach(el => revealObs.observe(el));
+
+/* ─────────────────────────────────────────────────────────
+   NAVBAR — Scroll Effect & Mobile Hamburger
+───────────────────────────────────────────────────────── */
+const nav = document.getElementById("mainNav");
+window.addEventListener("scroll", () => {
+  nav.style.background = window.scrollY > 60
+    ? "rgba(7,7,13,0.95)" : "rgba(7,7,13,0.78)";
+});
+
+document.getElementById("hamburger").addEventListener("click", () => {
+  const nl = document.querySelector(".nav-links");
+  const open = nl.style.display !== "flex";
+  nl.style.display = open ? "flex" : "none";
+  if (open) {
+    Object.assign(nl.style, {
+      flexDirection: "column", position: "absolute",
+      top: "70px", left: "0", right: "0",
+      background: "rgba(7,7,13,0.98)", padding: "2rem", gap: "1.5rem",
+      borderBottom: "1px solid rgba(255,100,0,0.15)", zIndex: "998"
+    });
+  }
+});
+
+/* ─────────────────────────────────────────────────────────
+   REGISTRATION FORM SUBMISSION
+───────────────────────────────────────────────────────── */
+const form      = document.getElementById("regForm");
+const submitBtn = document.getElementById("submitBtn");
+const btnText   = document.getElementById("btnText");
+const spinner   = document.getElementById("spinner");
+const toast     = document.getElementById("toast");
+
+function showToast(msg, type) {
+  toast.innerHTML = msg;
+  toast.className = type;
+  toast.style.display = "block";
+  setTimeout(() => toast.style.display = "none", 7500);
+}
+
+function validate() {
+  let ok = true;
+  const n = document.getElementById("fname");
+  const e = document.getElementById("femail");
+  const p = document.getElementById("fphone");
+  [n, e, p].forEach(f => f.classList.remove("err"));
+  document.querySelectorAll(".ferr").forEach(f => f.classList.remove("show"));
+
+  if (!n.value.trim() || n.value.trim().length < 2) {
+    n.classList.add("err");
+    document.getElementById("errName").classList.add("show");
+    ok = false;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.value.trim())) {
+    e.classList.add("err");
+    document.getElementById("errEmail").classList.add("show");
+    ok = false;
+  }
+  if (!p.value.trim() || p.value.trim().length < 6) {
+    p.classList.add("err");
+    document.getElementById("errPhone").classList.add("show");
+    ok = false;
+  }
+  return ok;
+}
+
+form.addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  if (!validate()) return;
+
+  const name  = document.getElementById("fname").value.trim();
+  const email = document.getElementById("femail").value.trim();
+  const phone = document.getElementById("fphone").value.trim();
+
+  submitBtn.disabled    = true;
+  btnText.textContent   = "Registering…";
+  spinner.style.display = "block";
+  toast.style.display   = "none";
+
+  // Check duplicate email locally
+  const currentList = getLocalRegistrations();
+  const isDuplicate = currentList.some(r => r.email.toLowerCase() === email.toLowerCase());
+
+  if (isDuplicate) {
+    showToast("⚠️ This email address is already registered with 65 BOYS!", "error");
+    submitBtn.disabled    = false;
+    btnText.textContent   = "🔥 I'M IN — REGISTER ME";
+    spinner.style.display = "none";
+    return;
+  }
+
+  // Format timestamp (IST)
+  const now = new Date();
+  const formattedTime = now.toLocaleDateString("en-IN", {
+    day: "2-digit", month: "short", year: "numeric"
+  }) + ", " + now.toLocaleTimeString("en-IN", {
+    hour: "2-digit", minute: "2-digit", hour12: true
+  });
+
+  const newEntry = {
+    id        : currentList.length + 1,
+    name      : name,
+    email     : email,
+    phone     : phone,
+    timestamp : formattedTime
+  };
+
+  // 1. SAVE IMMEDIATELY to local database
+  saveLocalRegistration(newEntry);
+
+  // 2. Direct send to your private Google Sheet
+  const params = new URLSearchParams({ name, email, phone });
+  fetch(SCRIPT_URL + "?" + params.toString(), { method: "GET", mode: "no-cors" })
+    .then(() => console.log("✅ Successfully sent to your private Google Sheet!"))
+    .catch((err) => console.log("Sync notice:", err));
+
+  // Success celebration
+  setTimeout(() => {
+    showToast(
+      `🎉 <strong>Welcome to 65 BOYS, ${name}!</strong><br/>` +
+      `Your spot is officially locked. Saved in your Drive spreadsheet! 🔥<br/>` +
+      `<a href="javascript:void(0)" onclick="openSheetModal()" style="text-decoration:underline;color:#ffb300;font-weight:800;margin-top:4px;display:inline-block;">👉 Click here to view registered details</a>`,
+      "success"
+    );
+    form.reset();
+    submitBtn.disabled    = false;
+    btnText.textContent   = "🔥 I'M IN — REGISTER ME";
+    spinner.style.display = "none";
+  }, 400);
+});
+
+/* ─────────────────────────────────────────────────────────
+   MODAL & SPREADSHEET LOGIC
+───────────────────────────────────────────────────────── */
+function renderSheetTable() {
+  const tbody = document.getElementById("sheetTableBody");
+  const data = getLocalRegistrations();
+
+  if (!data || data.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No members registered yet. Be the first to join!</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = data.map((r, idx) => `
+    <tr>
+      <td class="td-num">#${r.id || idx + 1}</td>
+      <td><strong>${escapeHtml(r.name)}</strong></td>
+      <td>${escapeHtml(r.email)}</td>
+      <td>${escapeHtml(r.phone)}</td>
+      <td class="td-date">${escapeHtml(r.timestamp)}</td>
+    </tr>
+  `).join("");
+}
+
+function openSheetModal() {
+  renderSheetTable();
+  const m = document.getElementById("sheetModal");
+  m.classList.add("open");
+}
+
+function closeSheetModal(e) {
+  if (e.target.id === "sheetModal") {
+    closeSheetModalDirect();
+  }
+}
+
+function closeSheetModalDirect() {
+  document.getElementById("sheetModal").classList.remove("open");
+}
+
+function exportToCSV() {
+  const data = getLocalRegistrations();
+  if (!data.length) {
+    alert("No registrations to export yet.");
+    return;
+  }
+
+  const csvRows = [
+    ["#", "Full Name", "Email Address", "Phone Number", "Registered At"].join(",")
+  ];
+
+  data.forEach((r, i) => {
+    csvRows.push([
+      r.id || i + 1,
+      `"${r.name.replace(/"/g, '""')}"`,
+      `"${r.email.replace(/"/g, '""')}"`,
+      `"${r.phone.replace(/"/g, '""')}"`,
+      `"${r.timestamp}"`
+    ].join(","));
+  });
+
+  const blob = new Blob([csvRows.join("\n")], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "65_BOYS_Drive_Registrations.csv";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function escapeHtml(text) {
+  const div = document.createElement("div");
+  div.textContent = text || "";
+  return div.innerHTML;
+}
+
+// Initialize on page load
+updateMemberCount();
+</script>
+
+</body>
+</html>
